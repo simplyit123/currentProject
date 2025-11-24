@@ -1,166 +1,91 @@
-import { useEffect, useState } from "react";
 import styled from "styled-components";
-import SearchResult from "./components/SearchResults/SearchResult";
-
-export const BASE_URL = "http://localhost:9000";
+import { useEffect, useState } from "react";
+import MainBodyContainer from "./MainBodyContainer";
+let BASE_URL = "http://localhost:9000";
 
 const App = () => {
-  const [data, setData] = useState(null);
-  const [filteredData, setFilteredData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [selectedBtn, setSelectedBtn] = useState("all");
+  let [data, setData] = useState(null);
+  let [error, setError] = useState("");
+  let [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchFoodData = async () => {
-      setLoading(true);
-
+    let FoodData = async () => {
       try {
-        const response = await fetch(BASE_URL);
+        setLoading(true);
+        let response = await fetch(BASE_URL);
+        let jsonData = await response.json();
+        setData(jsonData);
 
-        const json = await response.json();
-
-        setData(json);
-        setFilteredData(json);
         setLoading(false);
       } catch (error) {
-        setError("Unable to fetch data");
+        setError("Unable to fetch data")
       }
     };
-    fetchFoodData();
+
+    FoodData();
   }, []);
 
-  const searchFood = (e) => {
-    const searchValue = e.target.value;
-
-    console.log(searchValue);
-
-    if (searchValue === "") {
-      setFilteredData(null);
-    }
-
-    const filter = data?.filter((food) =>
-      food.name.toLowerCase().includes(searchValue.toLowerCase())
-    );
-    setFilteredData(filter);
-  };
-
-  const filterFood = (type) => {
-    if (type === "all") {
-      setFilteredData(data);
-      setSelectedBtn("all");
-      return;
-    }
-
-    const filter = data?.filter((food) =>
-      food.type.toLowerCase().includes(type.toLowerCase())
-    );
-    setFilteredData(filter);
-    setSelectedBtn(type);
-  };
-
-  const filterBtns = [
-    {
-      name: "All",
-      type: "all",
-    },
-    {
-      name: "Breakfast",
-      type: "breakfast",
-    },
-    {
-      name: "Lunch",
-      type: "lunch",
-    },
-    {
-      name: "Dinner",
-      type: "dinner",
-    },
-  ];
-
-  if (error) return <div>{error}</div>;
-  if (loading) return <div>loading.....</div>;
-
+  {error && <p>{error}</p>}
+  {loading && <h4>Loading...</h4>}
+  
   return (
     <>
-      <Container>
-        <TopContainer>
+      <MainContainer>
+        <TopSection>
           <div className="logo">
             <img src="/logo.svg" alt="logo" />
           </div>
 
-          <div className="search">
-            <input onChange={searchFood} placeholder="Search Food" />
-          </div>
-        </TopContainer>
+          <input placeholder="Search Food..." />
+        </TopSection>
 
         <FilterContainer>
-          {filterBtns.map((value) => (
-            <Button
-              isSelected={selectedBtn === value.type}
-              key={value.name}
-              onClick={() => filterFood(value.type)}
-            >
-              {value.name}
-            </Button>
-          ))}
+          <Buttons>All</Buttons>
+          <Buttons>Breakfast</Buttons>
+          <Buttons>Lunch</Buttons>
+          <Buttons>Dinner</Buttons>
         </FilterContainer>
-      </Container>
-      <SearchResult data={filteredData} />
+
+        <MainBodyContainer />
+      </MainContainer>
     </>
   );
 };
 
 export default App;
 
-export const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-const TopContainer = styled.section`
+let MainContainer = styled.div``;
+
+let TopSection = styled.section`
   height: 140px;
+  align-items: center;
+  margin: 0 100px 0 100px;
   display: flex;
   justify-content: space-between;
-  padding: 16px;
-  align-items: center;
 
-  .search {
-    input {
-      background-color: transparent;
-      border: 1px solid red;
-      color: white;
-      border-radius: 5px;
-      height: 40px;
-      font-size: 16px;
-      padding: 0 10px;
-      &::placeholder {
-        color: white;
-      }
-    }
+  input {
+    background: transparent;
+    padding: 10px 5px;
+    border: 1px solid red;
+    border-radius: 5px;
+    color: white;
   }
 
-  @media (0 < width < 600px) {
-    flex-direction: column;
-    height: 120px;
+  input::placeholder {
+    color: white;
   }
 `;
 
-const FilterContainer = styled.section`
+let FilterContainer = styled.section`
   display: flex;
   justify-content: center;
-  gap: 12px;
-  padding-bottom: 40px;
 `;
 
-export const Button = styled.button`
-  background: ${({ isSelected }) => (isSelected ? "#f22f2f" : "#ff4343")};
-  outline: 1px solid ${({ isSelected }) => (isSelected ? "white" : "#ff4343")};
-  border-radius: 5px;
-  padding: 6px 12px;
-  border: none;
+let Buttons = styled.button`
   color: white;
-  cursor: pointer;
-  &:hover {
-    background-color: #f22f2f;
-  }
+  background-color: #ff4141;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border-style: none;
+  margin-left: 7px;
 `;
