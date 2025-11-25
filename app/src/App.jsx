@@ -1,12 +1,14 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import MainBodyContainer from "./MainBodyContainer";
-let BASE_URL = "http://localhost:9000";
+export let BASE_URL = "http://localhost:9000";
 
 const App = () => {
-  let [data, setData] = useState(null);
+  let [data, setData] = useState([]);
   let [error, setError] = useState("");
   let [loading, setLoading] = useState(false);
+  let [searchData, setSearchData] = useState();
+  let [searchVal, setsearchVal] = useState()
 
   useEffect(() => {
     let FoodData = async () => {
@@ -15,7 +17,8 @@ const App = () => {
         let response = await fetch(BASE_URL);
         let jsonData = await response.json();
         setData(jsonData);
-
+        setSearchData(jsonData)
+        
         setLoading(false);
       } catch (error) {
         setError("Unable to fetch data")
@@ -25,7 +28,16 @@ const App = () => {
     FoodData();
   }, []);
 
-  {error && <p>{error}</p>}
+  function handleSearchData(){
+    // if(seachVal===""){
+    //   setSearchData()
+    // }
+
+    let filter = data.filter((food)=>food?.name.toLowerCase().includes(searchData?.toLowerCase()))
+    setSearchData(filter)
+  }
+  
+  {error && <p> {error}</p>}
   {loading && <h4>Loading...</h4>}
   
   return (
@@ -36,7 +48,7 @@ const App = () => {
             <img src="/logo.svg" alt="logo" />
           </div>
 
-          <input placeholder="Search Food..." />
+          <input onChange={()=>handleSearchData()} placeholder="Search Food..." />
         </TopSection>
 
         <FilterContainer>
@@ -46,7 +58,7 @@ const App = () => {
           <Buttons>Dinner</Buttons>
         </FilterContainer>
 
-        <MainBodyContainer />
+        <MainBodyContainer data={searchData}/>
       </MainContainer>
     </>
   );
@@ -81,7 +93,7 @@ let FilterContainer = styled.section`
   justify-content: center;
 `;
 
-let Buttons = styled.button`
+export let Buttons = styled.button`
   color: white;
   background-color: #ff4141;
   padding: 5px 10px;

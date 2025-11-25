@@ -15,6 +15,7 @@ let GlobalStyle = createGlobalStyle`
     color: white;
     min-height: 100vh;
     overflow: hidden;
+    font-family: "inter", sans-serif;
   }
 `
 
